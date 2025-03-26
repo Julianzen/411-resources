@@ -27,22 +27,28 @@ class Boxer:
 
 def create_boxer(name: str, weight: int, height: int, reach: float, age: int) -> None:
     """
-        Creates a boxer. Takes in 5 input parameters. 
+        Creates a new boxer in the boxer relation.
+        
+        Arguments: 
         
         A String variable: name 
         3 int variables: weight, height, age
         A float variable: reach 
         
+        Exceptions Raised: 
+            
         Also checks the parameters to see if they have unreasonable values and raises ValueError 
         exceptions if so. For example, checking if the weight is less than 125 and returning a ValueError as that
         weight is too low. 
         
-        Also returns a ValueError if there is a boxer with the same name already in the codebase.
+        Also raises a ValueError if there is a boxer with the same name already in the codebase.
         
         If the arguments have valid values, then a connection is established and a tuple with the arguments
         is inserted into the boxers relation and committed. 
         
-        This function returns nothing. 
+        Returned: 
+            
+        This function returns nothing(None).
     """
 
     if weight < 125:
