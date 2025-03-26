@@ -133,7 +133,21 @@ def delete_boxer(boxer_id: int) -> None:
 
 def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
     """
-     Enter docstring here. 
+     Gets the boxer leaderboard.
+     
+     Arguments: 
+         
+         1 string variable: sort_by -> Default value of wins if there is no argument. 
+         Gives leaderboard sorted by this argument in descending order.
+         
+         
+    Exceptions Raised:
+        ValueError if there is an invalid sort_by parameter.
+        sqlite3.Error if there is any database error. 
+    
+    Returned:
+        List of dictionaries. Each dictionary maps the argument key to values of any other type 
+        represented by Any. 
     """ 
     
     query = """
@@ -148,6 +162,7 @@ def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
     elif sort_by == "wins":
         query += " ORDER BY wins DESC"
     else:
+        logger.warning("Invalid sort by parameter provided. Should be a valid attribute.")
         raise ValueError(f"Invalid sort_by parameter: {sort_by}")
 
     try:
@@ -172,6 +187,7 @@ def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
             }
             leaderboard.append(boxer)
 
+        logger.info("Leaderboard successfully acquired.")
         return leaderboard
 
     except sqlite3.Error as e:
