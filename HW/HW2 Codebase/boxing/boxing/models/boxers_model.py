@@ -195,9 +195,19 @@ def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
 
 
 def get_boxer_by_id(boxer_id: int) -> Boxer:
-    
     """
-     Enter docstring here. 
+     Gets a boxer by identifying one with a given boxer_id.
+     
+     Argument:
+         
+         1 int variable: boxer_id -> provides a unique way to identify each boxer with an ID.
+         
+    Exceptions Raised: 
+        ValueError raised if boxer_id is not valid and we are not able to identify a boxer.
+        sqlite3.Error raised if there are any database errors. 
+        
+    Returned: 
+        A boxer object if a boxer is identifiable with the boxer_id provided. 
     """ 
     
     try:
@@ -215,8 +225,10 @@ def get_boxer_by_id(boxer_id: int) -> Boxer:
                     id=row[0], name=row[1], weight=row[2], height=row[3],
                     reach=row[4], age=row[5]
                 )
+                logger.info("A boxer was found with the boxer_id provided.")
                 return boxer
             else:
+                logger.error("boxer_id is invalid and does not identify any boxers in table.")
                 raise ValueError(f"Boxer with ID {boxer_id} not found.")
 
     except sqlite3.Error as e:
