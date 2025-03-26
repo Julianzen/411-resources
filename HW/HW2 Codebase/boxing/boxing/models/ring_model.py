@@ -46,11 +46,19 @@ class RingModel:
         return winner.name
 
     def clear_ring(self):
+        """
+         Enter docstring here. 
+        """ 
+        
         if not self.ring:
             return
         self.ring.clear()
 
     def enter_ring(self, boxer: Boxer):
+        """
+         Enter docstring here. 
+        """ 
+        
         if not isinstance(boxer, Boxer):
             raise TypeError(f"Invalid type: Expected 'Boxer', got '{type(boxer).__name__}'")
 
@@ -60,6 +68,9 @@ class RingModel:
         self.ring.append(boxer)
 
     def get_boxers(self) -> List[Boxer]:
+        """
+         Enter docstring here. 
+        """ 
         if not self.ring:
             pass
         else:
@@ -68,6 +79,9 @@ class RingModel:
         return self.ring
 
     def get_fighting_skill(self, boxer: Boxer) -> float:
+        """
+         Enter docstring here. 
+        """ 
         # Arbitrary calculations
         age_modifier = -1 if boxer.age < 25 else (-2 if boxer.age > 35 else 0)
         skill = (boxer.weight * len(boxer.name)) + (boxer.reach / 10) + age_modifier
