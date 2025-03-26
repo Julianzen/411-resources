@@ -35,13 +35,18 @@ def create_boxer(name: str, weight: int, height: int, reach: float, age: int) ->
         3 int variables: weight, height, age
         A float variable: reach 
         
+        Name, weight, height, age provide characteristics of the boxer. And reach provides his ability. 
+        
         Exceptions Raised: 
             
         Also checks the parameters to see if they have unreasonable values and raises ValueError 
         exceptions if so. For example, checking if the weight is less than 125 and returning a ValueError as that
         weight is too low. 
         
-        Also raises a ValueError if there is a boxer with the same name already in the codebase.
+        Also raises a ValueError/sqlite3.Integrity Error
+        if there is a boxer with the same name already in the codebase.
+        
+        sqlite3.Error for any Database errors. 
         
         If the arguments have valid values, then a connection is established and a tuple with the arguments
         is inserted into the boxers relation and committed. 
@@ -94,7 +99,18 @@ def create_boxer(name: str, weight: int, height: int, reach: float, age: int) ->
 
 def delete_boxer(boxer_id: int) -> None:
     """
-     Enter docstring here. 
+        Deletes a boxer from the boxer relation.
+        
+        Arguments: 
+            
+            1 int variable: boxer_id -> provides a unique way to identify each boxer with an ID.
+            
+        Exceptions Raised:
+            Raises ValueError if the boxer_id is invalid and no boxer with it can be found.
+            sqlite3.Error for any database errors.
+        
+        Returned:
+            None --> Nothing is returned 
     """ 
     try:
         with get_db_connection() as conn:
@@ -102,10 +118,14 @@ def delete_boxer(boxer_id: int) -> None:
 
             cursor.execute("SELECT id FROM boxers WHERE id = ?", (boxer_id,))
             if cursor.fetchone() is None:
+                logger.error("boxer_id is invalid and does not identify any boxers in table.")
                 raise ValueError(f"Boxer with ID {boxer_id} not found.")
 
             cursor.execute("DELETE FROM boxers WHERE id = ?", (boxer_id,))
             conn.commit()
+            
+            logger.info("Boxer successfully deleted.")
+
 
     except sqlite3.Error as e:
         raise e
