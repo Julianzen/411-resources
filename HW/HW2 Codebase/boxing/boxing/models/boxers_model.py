@@ -26,6 +26,24 @@ class Boxer:
 
 
 def create_boxer(name: str, weight: int, height: int, reach: float, age: int) -> None:
+    """
+        Creates a boxer. Takes in 5 input parameters. 
+        
+        A String variable: name 
+        3 int variables: weight, height, age
+        A float variable: reach 
+        
+        Also checks the parameters to see if they have unreasonable values and raises ValueError 
+        exceptions if so. For example, checking if the weight is less than 125 and returning a ValueError as that
+        weight is too low. 
+        
+        Also returns a ValueError if there is a boxer with the same name already in the codebase.
+        
+        If the arguments have valid values, then a connection is established and a tuple with the arguments
+        is inserted into the boxers relation and committed. 
+        
+        This function returns nothing. 
+    """
 
     if weight < 125:
         raise ValueError(f"Invalid weight: {weight}. Must be at least 125.")
@@ -60,6 +78,9 @@ def create_boxer(name: str, weight: int, height: int, reach: float, age: int) ->
 
 
 def delete_boxer(boxer_id: int) -> None:
+    """
+     Enter docstring here. 
+    """ 
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
@@ -76,6 +97,10 @@ def delete_boxer(boxer_id: int) -> None:
 
 
 def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
+    """
+     Enter docstring here. 
+    """ 
+    
     query = """
         SELECT id, name, weight, height, reach, age, fights, wins,
                (wins * 1.0 / fights) AS win_pct
@@ -119,6 +144,11 @@ def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
 
 
 def get_boxer_by_id(boxer_id: int) -> Boxer:
+    
+    """
+     Enter docstring here. 
+    """ 
+    
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
@@ -143,6 +173,11 @@ def get_boxer_by_id(boxer_id: int) -> Boxer:
 
 
 def get_boxer_by_name(boxer_name: str) -> Boxer:
+    
+    """
+     Enter docstring here. 
+    """ 
+    
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
@@ -167,6 +202,11 @@ def get_boxer_by_name(boxer_name: str) -> Boxer:
 
 
 def get_weight_class(weight: int) -> str:
+    
+    """
+     Enter docstring here. 
+    """ 
+    
     if weight >= 203:
         weight_class = 'HEAVYWEIGHT'
     elif weight >= 166:
@@ -182,6 +222,11 @@ def get_weight_class(weight: int) -> str:
 
 
 def update_boxer_stats(boxer_id: int, result: str) -> None:
+    
+    """
+     Enter docstring here. 
+    """ 
+    
     if result not in {'win', 'loss'}:
         raise ValueError(f"Invalid result: {result}. Expected 'win' or 'loss'.")
 
