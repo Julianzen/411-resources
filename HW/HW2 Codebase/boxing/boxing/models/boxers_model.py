@@ -238,7 +238,18 @@ def get_boxer_by_id(boxer_id: int) -> Boxer:
 def get_boxer_by_name(boxer_name: str) -> Boxer:
     
     """
-     Enter docstring here. 
+     Gets a boxer by identifying one with a given boxer name.
+     
+     Argument: 
+         
+         1 string variable: boxer_name -> provides a way to identify a boxer with his/her name. 
+    
+    Exceptions Raised: 
+        ValueError raised if boxer_id is not valid and we are not able to identify a boxer.
+        sqlite3.Error raised if there are any database errors. 
+        
+    Returned: 
+        A boxer object if a boxer is identifiable with the boxer_name provided. 
     """ 
     
     try:
@@ -256,8 +267,10 @@ def get_boxer_by_name(boxer_name: str) -> Boxer:
                     id=row[0], name=row[1], weight=row[2], height=row[3],
                     reach=row[4], age=row[5]
                 )
+                logger.info("A boxer was found with the boxer_name provided.")
                 return boxer
             else:
+                logger.error("boxer_name is invalid and does not identify any boxers in table.")
                 raise ValueError(f"Boxer '{boxer_name}' not found.")
 
     except sqlite3.Error as e:
