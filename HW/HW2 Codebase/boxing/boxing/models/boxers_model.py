@@ -46,12 +46,16 @@ def create_boxer(name: str, weight: int, height: int, reach: float, age: int) ->
     """
 
     if weight < 125:
+        logger.warning("Invalid boxer weight provided. Should not be below 125.")
         raise ValueError(f"Invalid weight: {weight}. Must be at least 125.")
     if height <= 0:
+        logger.warning("Invalid boxer height provided. Should not be negative.")
         raise ValueError(f"Invalid height: {height}. Must be greater than 0.")
     if reach <= 0:
+        logger.warning("Invalid boxer reach provided. Should not be negative. ")
         raise ValueError(f"Invalid reach: {reach}. Must be greater than 0.")
     if not (18 <= age <= 40):
+        logger.warning("Invalid boxer age provided. Should not be younger than 18 or older than 40.")
         raise ValueError(f"Invalid age: {age}. Must be between 18 and 40.")
 
     try:
@@ -61,6 +65,7 @@ def create_boxer(name: str, weight: int, height: int, reach: float, age: int) ->
             # Check if the boxer already exists (name must be unique)
             cursor.execute("SELECT 1 FROM boxers WHERE name = ?", (name,))
             if cursor.fetchone():
+                logger.error(f"Boxer already exists: {name} - {height} ({age})")
                 raise ValueError(f"Boxer with name '{name}' already exists")
 
             cursor.execute("""
@@ -69,11 +74,15 @@ def create_boxer(name: str, weight: int, height: int, reach: float, age: int) ->
             """, (name, weight, height, reach, age))
 
             conn.commit()
+            
+            logger.info(f"Boxer successfully added: {name} - {height} ({age})")
 
     except sqlite3.IntegrityError:
+        logger.error(f"Boxer already exists: {name} - {height} ({age})")
         raise ValueError(f"Boxer with name '{name}' already exists")
 
     except sqlite3.Error as e:
+        logger.error(f"Database error while creating boxer: {e}")
         raise e
 
 
