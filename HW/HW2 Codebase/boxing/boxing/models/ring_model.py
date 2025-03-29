@@ -12,10 +12,32 @@ configure_logger(logger)
 
 
 class RingModel:
+    """
+    A class to manage the Boxers in the Ring.
+    
+    Attributes:
+        ring: The list of boxers in the ring.
+    """
     def __init__(self):
+        """
+        Initializes RingModel Object with an empty list of Boxers.
+
+        """
         self.ring: List[Boxer] = []
 
     def fight(self) -> str:
+        """
+        Simulates a fight between two boxers and decides the winner and loser.
+        
+        Arguments:
+            self: The RingModel object 
+            
+        Exceptions Raised:
+            ValueError if the ring does not have 2 boxers so a fight can not occur.
+            
+        Returns:
+            The name of the Boxer that won.
+        """
         if len(self.ring) < 2:
             raise ValueError("There must be two boxers to start a fight.")
 
