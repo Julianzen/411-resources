@@ -39,6 +39,7 @@ class RingModel:
             The name of the Boxer that won.
         """
         if len(self.ring) < 2:
+            logger.error("Need two boxers for a fight to happen.")
             raise ValueError("There must be two boxers to start a fight.")
 
         boxer_1, boxer_2 = self.get_boxers()
@@ -65,12 +66,21 @@ class RingModel:
 
         self.clear_ring()
 
+        logger.info("Winner of the fight will be shown now.")
         return winner.name
 
     def clear_ring(self):
         """
-         Enter docstring here. 
+         Clears the ring of any boxers.
+         
+         Argument:
+             self: The RingModel object.
+        
+        Returns:
+            Nothing
         """ 
+        
+        logger.info("Received request to clear the ring of any Boxers.")
         
         if not self.ring:
             return
@@ -78,13 +88,22 @@ class RingModel:
 
     def enter_ring(self, boxer: Boxer):
         """
-         Enter docstring here. 
+         Makes a Boxer enter the ring.
+         
+         Arguments:
+             self: The RingModel object
+             boxer: Instance of a Boxer Object representing a boxer. 
+             
+        Returns:
+            Nothing
         """ 
         
         if not isinstance(boxer, Boxer):
+            logger.error("boxer is not an instance of Boxer")
             raise TypeError(f"Invalid type: Expected 'Boxer', got '{type(boxer).__name__}'")
 
         if len(self.ring) >= 2:
+            logger.error("Ring is already at maximum capacity.")
             raise ValueError("Ring is full, cannot add more boxers.")
 
         self.ring.append(boxer)
