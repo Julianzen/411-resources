@@ -57,10 +57,10 @@ def test_create_boxer(mock_cursor):
     """Test creating a new boxer in the catalog.
 
     """
-    create_boxer(name="Boxer Name", weight=140, height=177, reach=20.2,age=30)
+    create_boxer(name="Boxer Name", weight=140, height=177, reach=20.2,age=30, weight_class = "HEAVYWEIGHT")
 
     expected_query = normalize_whitespace("""
-        INSERT INTO songs (name, weight, height, reach, age, weight_class)
+        INSERT INTO boxer (name, weight, height, reach, age, weight_class)
         VALUES (?, ?, ?, ?, ?, ?)
     """)
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
@@ -69,20 +69,20 @@ def test_create_boxer(mock_cursor):
 
     # Extract the arguments used in the SQL call (second element of call_args)
     actual_arguments = mock_cursor.execute.call_args[0][1]
-    expected_arguments = ("Boxer Name", 80, 140, 20.2, 30, "MIDDLEWEIGHT")
+    expected_arguments = ("Boxer Name", 140, 177, 20.2, 30, "HEAVYWEIGHT")
 
     assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
 
 
-def test_create_song_duplicate(mock_cursor):
-    """Test creating a boxer with a duplicate artist, title, and year (should raise an error).
+def test_create_boxer_duplicate(mock_cursor):
+    """Test creating a boxer with a duplicate name, weight, and height (should raise an error).
 
     """
     # Simulate that the database will raise an IntegrityError due to a duplicate entry
-    mock_cursor.execute.side_effect = sqlite3.IntegrityError("UNIQUE constraint failed: songs.artist, songs.title, songs.year")
+    mock_cursor.execute.side_effect = sqlite3.IntegrityError("UNIQUE constraint failed: boxer.name, boxer.weight, boxer.height")
 
-    with pytest.raises(ValueError, match="Song with artist 'Artist Name', title 'Song Title', and year 2022 already exists."):
-        create_song(artist="Artist Name", title="Song Title", year=2022, genre="Pop", duration=180)
+    with pytest.raises(ValueError, match="Boxer with name 'Boxer Name', weight 'Boxer Weight', and height 'Boxer Height' already exists."):
+        create_boxer(name="Boxer Name", weight="Boxer Weight", height='Boxer Height', reach = 20.2, age = 30, weight_class = "HEAVYWEIGHT")
 
 
 def test_create_song_invalid_duration():
