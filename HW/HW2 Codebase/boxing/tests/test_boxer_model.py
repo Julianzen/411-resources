@@ -81,19 +81,19 @@ def test_create_boxer_duplicate(mock_cursor):
     # Simulate that the database will raise an IntegrityError due to a duplicate entry
     mock_cursor.execute.side_effect = sqlite3.IntegrityError("UNIQUE constraint failed: boxer.name, boxer.weight, boxer.height")
 
-    with pytest.raises(ValueError, match="Boxer with name 'Boxer Name', weight 'Boxer Weight', and height 'Boxer Height' already exists."):
-        create_boxer(name="Boxer Name", weight="Boxer Weight", height='Boxer Height', reach = 20.2, age = 30, weight_class = "HEAVYWEIGHT")
+    with pytest.raises(ValueError, match="Boxer with name 'Boxer Name', weight 140, and height 77 already exists."):
+        create_boxer(name="Boxer Name", weight= 140 , height= 177, reach = 20.2, age = 30, weight_class = "HEAVYWEIGHT")
 
 
-def test_create_song_invalid_duration():
-    """Test error when trying to create a song with an invalid duration (e.g., negative duration)
+def test_create_boxer_invalid_weight():
+    """Test error when trying to create a boxer with an invalid weight (e.g., lower than 125 pounds)
 
     """
-    with pytest.raises(ValueError, match=r"Invalid duration: -180 \(must be a positive integer\)."):
-        create_song(artist="Artist Name", title="Song Title", year=2022, genre="Pop", duration=-180)
+    with pytest.raises(ValueError, match=r"Invalid weight: 100 \(must be greater than or equal to 125\)."):
+        create_song(name="Boxer Name", weight = 100, height= 177 , age = 30, reach = 20, weight_class = "MIDDLEWEIGHT")
 
-    with pytest.raises(ValueError, match=r"Invalid duration: invalid \(must be a positive integer\)."):
-        create_song(artist="Artist Name", title="Song Title", year=2022, genre="Pop", duration="invalid")
+    with pytest.raises(ValueError, match=r"Invalid weight: -150 \(must be a positive integer\)."):
+        create_song(name="Boxer Name", weight=-150 , height = 177, age = 30, reach = 20, weight_class = "MIDDLEWEIGHT")
 
 
 def test_create_song_invalid_year():
