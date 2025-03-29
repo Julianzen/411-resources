@@ -108,7 +108,29 @@ def test_create_boxer_invalid_height():
     with pytest.raises(ValueError, match=r"Invalid height: invalid \(must be an integer greater than or equal to 0\)."):
         create_boxer(name="Boxer Name", weight=140, height="invalid", age = 30, reach = 20, weight_class = "MIDDLEWEIGHT")
 
+def test_create_boxer_invalid_reach():
+    """Test error when trying to create a boxer with an invalid reach (e.g., less than 0 or non-integer).
 
+    """
+    with pytest.raises(ValueError, match=r"Invalid reach: -10 \(must be an integer greater than or equal to 0\)."):
+        create_boxer(name="Boxer Name", weight=140, height=177, age = 30, reach = -10, weight_class = "MIDDLEWEIGHT")
+
+    with pytest.raises(ValueError, match=r"Invalid reach: invalid \(must be an integer greater than or equal to 0\)."):
+        create_boxer(name="Boxer Name", weight=140, height=177, age = 30, reach = "invalid", weight_class = "MIDDLEWEIGHT")
+        
+def test_create_boxer_invalid_age():
+    """Test error when trying to create a boxer with an invalid age (e.g., less than 18 or greater than 40 or non-integer).
+
+    """
+    with pytest.raises(ValueError, match=r"Invalid age: -10 \(must be an integer less than or equal to 40 and greater than or equal to 18\)."):
+        create_boxer(name="Boxer Name", weight=140, height=177, age = -10, reach = 20, weight_class = "MIDDLEWEIGHT")
+    
+    with pytest.raises(ValueError, match=r"Invalid age: 50 \(must be an integer less than or equal to 40 and greater than or equal to 18\)."):
+        create_boxer(name="Boxer Name", weight=140, height=177, age = 50, reach = 20, weight_class = "MIDDLEWEIGHT")
+
+    with pytest.raises(ValueError, match=r"Invalid age: invalid \(must be an integer less than or equal to 40 and greater than or equal to 18\)."):
+        create_boxer(name="Boxer Name", weight=140, height=177, age = "invalid", reach = 20, weight_class = "MIDDLEWEIGHT")
+        
 def test_delete_song(mock_cursor):
     """Test deleting a song from the catalog by song ID.
 
