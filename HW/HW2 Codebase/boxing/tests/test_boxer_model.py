@@ -90,21 +90,23 @@ def test_create_boxer_invalid_weight():
 
     """
     with pytest.raises(ValueError, match=r"Invalid weight: 100 \(must be greater than or equal to 125\)."):
-        create_song(name="Boxer Name", weight = 100, height= 177 , age = 30, reach = 20, weight_class = "MIDDLEWEIGHT")
+        create_boxer(name="Boxer Name", weight = 100, height= 177 , age = 30, reach = 20, weight_class = "MIDDLEWEIGHT")
 
     with pytest.raises(ValueError, match=r"Invalid weight: -150 \(must be a positive integer\)."):
-        create_song(name="Boxer Name", weight=-150 , height = 177, age = 30, reach = 20, weight_class = "MIDDLEWEIGHT")
+        create_boxer(name="Boxer Name", weight=-150 , height = 177, age = 30, reach = 20, weight_class = "MIDDLEWEIGHT")
+        
+     with pytest.raises(ValueError, match=r"Invalid weight: invalid \(must be a positive integer\)."):
+         create_boxer(name="Boxer Name", weight="invalid", height=177, age = 30, reach = 20, weight_class = "MIDDLEWEIGHT")
 
-
-def test_create_song_invalid_year():
-    """Test error when trying to create a song with an invalid year (e.g., less than 1900 or non-integer).
+def test_create_boxer_invalid_height():
+    """Test error when trying to create a boxer with an invalid height (e.g., less than 0 or non-integer).
 
     """
-    with pytest.raises(ValueError, match=r"Invalid year: 1899 \(must be an integer greater than or equal to 1900\)."):
-        create_song(artist="Artist Name", title="Song Title", year=1899, genre="Pop", duration=180)
+    with pytest.raises(ValueError, match=r"Invalid height: -10 \(must be an integer greater than or equal to 0\)."):
+        create_boxer(name="Boxer Name", weight=140, height=-10, age = 30, reach = 20, weight_class = "MIDDLEWEIGHT")
 
-    with pytest.raises(ValueError, match=r"Invalid year: invalid \(must be an integer greater than or equal to 1900\)."):
-        create_song(artist="Artist Name", title="Song Title", year="invalid", genre="Pop", duration=180)
+    with pytest.raises(ValueError, match=r"Invalid height: invalid \(must be an integer greater than or equal to 0\)."):
+        create_boxer(name="Boxer Name", weight=140, height="invalid", age = 30, reach = 20, weight_class = "MIDDLEWEIGHT")
 
 
 def test_delete_song(mock_cursor):
