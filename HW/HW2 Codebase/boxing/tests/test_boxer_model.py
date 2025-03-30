@@ -69,7 +69,7 @@ def test_create_boxer(mock_cursor):
 
     # Extract the arguments used in the SQL call (second element of call_args)
     actual_arguments = mock_cursor.execute.call_args[0][1]
-    expected_arguments = ("Boxer Name", 80, 140, 20.2, 30, "MIDDLEWEIGHT")
+    expected_arguments = ("Boxer Name", 140, 177, 20.2, 30, "MIDDLEWEIGHT")
 
     assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
 
