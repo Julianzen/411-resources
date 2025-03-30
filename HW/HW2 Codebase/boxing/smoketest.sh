@@ -219,6 +219,7 @@ check_db
 
 # Create boxers
 create_boxer "Boxer 1" 172 181 71.5 27
+create_boxer "Boxer 1" 170 180 70 25
 create_boxer "Boxer 2" 188 179 73.2 30
 create_boxer "Boxer 3" 134 170 68.9 24
 create_boxer "Boxer 4" 205 185 76.1 32
