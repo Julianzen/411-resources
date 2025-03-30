@@ -89,6 +89,7 @@ def test_fight_with_two_boxers_boxer_one_wins(ring_model, sample_boxer1, sample_
 
     """
     mocker.patch("boxing.models.ring_model.get_random", return_value=0.1)
+    mocker.patch("boxing.models.ring_model.update_boxer_stats")
 
     ring_model.enter_ring(sample_boxer1)
     ring_model.enter_ring(sample_boxer2)
@@ -101,6 +102,7 @@ def test_fight_with_two_boxers_boxer_two_wins(ring_model, sample_boxer1, sample_
 
     """
     mocker.patch("boxing.models.ring_model.get_random", return_value=0.9)
+    mocker.patch("boxing.models.ring_model.update_boxer_stats")  # <-- Mock DB update
 
     ring_model.enter_ring(sample_boxer1)
     ring_model.enter_ring(sample_boxer2)
