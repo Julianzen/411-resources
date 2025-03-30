@@ -60,8 +60,8 @@ def test_create_boxer(mock_cursor):
     create_boxer(name="Boxer Name", weight=140, height=177, reach=20.2,age=30)
 
     expected_query = normalize_whitespace("""
-        INSERT INTO boxers (name, weight, height, reach, age, weight_class)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO boxers (name, weight, height, reach, age)
+        VALUES (?, ?, ?, ?, ?)
     """)
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
 
@@ -69,7 +69,7 @@ def test_create_boxer(mock_cursor):
 
     # Extract the arguments used in the SQL call (second element of call_args)
     actual_arguments = mock_cursor.execute.call_args[0][1]
-    expected_arguments = ("Boxer Name", 140, 177, 20.2, 30, "MIDDLEWEIGHT")
+    expected_arguments = ("Boxer Name", 140, 177, 20.2, 30)
 
     assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
 
@@ -81,18 +81,18 @@ def test_create_boxer_duplicate(mock_cursor):
     # Simulate that the database will raise an IntegrityError due to a duplicate entry
     mock_cursor.execute.side_effect = sqlite3.IntegrityError("UNIQUE constraint failed: boxers.name, boxers.weight, boxers.height, boxers.age")
 
-    with pytest.raises(ValueError, match="Boxer with name 'Boxer Name', height '140', reach '20.2', and age 30 already exists."):
+    with pytest.raises(ValueError, match="Boxer with name 'Boxer Name' already exists"):
         create_boxer(name="Boxer Name", weight=140, height=177, reach=20.2,age=30)
 
 def test_create_boxer_invalid_weight():
     """Test error when trying to create a boxer with an invalid weight (e.g., negative weight)
 
     """
-    with pytest.raises(ValueError, match=r"Invalid weight: -180 \(must be an integer greater than or equal to 125\)."):
+    with pytest.raises(ValueError, match="Invalid weight: -140. Must be at least 125."):
         
         create_boxer(name="Boxer Name", weight=-140, height=177, reach=20.2,age=30)
 
-    with pytest.raises(ValueError, match=r"Invalid weight: invalid \(must be an integer greater than or equal to 125\)."):
+    with pytest.raises(ValueError, match="Invalid weight: invalid. Must be at least 125."):
         
         create_boxer(name="Boxer Name", weight="invalid", height=177, reach=20.2,age=30)
 
@@ -101,35 +101,35 @@ def test_create_boxer_invalid_height():
     """Test error when trying to create a boxer with an invalid height (e.g., non-negative).
 
     """
-    with pytest.raises(ValueError, match=r"Invalid height: -177 \(must be a positive integer\)."):
+    with pytest.raises(ValueError, match="Invalid height: -177. Must be greater than 0."):
        
         create_boxer(name="Boxer Name", weight=140, height=-177, reach=20.2,age=30)
         
 
-    with pytest.raises(ValueError, match=r"Invalid height: -177 \(must be a positive integer\)."):
+    with pytest.raises(ValueError, match="Invalid height: invalid. Must be greater than 0."):
         create_boxer(name="Boxer Name", weight=140, height="invalid", reach=20.2,age=30)
 
 def test_create_boxer_invalid_reach():
     """Test error when trying to create a boxer with an invalid reach (e.g., less than 0 or non-integer).
 
     """
-    with pytest.raises(ValueError, match=r"Invalid reach: -10 \(must be an integer greater than or equal to 0\)."):
+    with pytest.raises(ValueError, match="Invalid reach: -10. Must be greater than 0."):
         create_boxer(name="Boxer Name", weight=140, height=177, reach = -10, age = 30)
 
-    with pytest.raises(ValueError, match=r"Invalid reach: invalid \(must be an integer greater than or equal to 0\)."):
+    with pytest.raises(ValueError, match="Invalid reach: invalid. Must be greater than 0."):
         create_boxer(name="Boxer Name", weight=140, height=177, reach = "invalid", age = 30)
         
 def test_create_boxer_invalid_age():
     """Test error when trying to create a boxer with an invalid age (e.g., less than 18 or greater than 40 or non-integer).
 
     """
-    with pytest.raises(ValueError, match=r"Invalid age: -10 \(must be an integer less than or equal to 40 and greater than or equal to 18\)."):
+    with pytest.raises(ValueError, match="Invalid age: -10. Must be between 18 and 40."):
         create_boxer(name="Boxer Name", weight=140, height=177, reach = 20, age = -10)
     
-    with pytest.raises(ValueError, match=r"Invalid age: 50 \(must be an integer less than or equal to 40 and greater than or equal to 18\)."):
+    with pytest.raises(ValueError, match="Invalid age: 50. Must be between 18 and 40."):
         create_boxer(name="Boxer Name", weight=140, height=177, reach = 20, age = 50)
 
-    with pytest.raises(ValueError, match=r"Invalid age: invalid \(must be an integer less than or equal to 40 and greater than or equal to 18\)."):
+    with pytest.raises(ValueError, match="Invalid age: invalid. Must be between 18 and 40."):
         create_boxer(name="Boxer Name", weight=140, height=177, reach = 20, age = "invalid")
         
         
@@ -185,10 +185,9 @@ def test_delete_boxer_bad_id(mock_cursor):
 def test_get_boxer_by_id(mock_cursor):
     """Test getting a boxer by id.
 
-        unsure about the False value
 
     """
-    mock_cursor.fetchone.return_value = (1, "Boxer Name", 140, 177, 20.2,30, False)
+    mock_cursor.fetchone.return_value = (1, "Boxer Name", 140, 177, 20.2,30)
 
     result = get_boxer_by_id(1)
 
@@ -219,10 +218,9 @@ def test_get_boxer_by_id_bad_id(mock_cursor):
 def test_get_boxer_by_name(mock_cursor):
     """Test getting a boxer by name.
 
-        unsure about the False value
 
     """
-    mock_cursor.fetchone.return_value = (1, "Boxer Name", 140, 177, 20.2,30, False)
+    mock_cursor.fetchone.return_value = (1, "Boxer Name", 140, 177, 20.2,30)
 
     result = get_boxer_by_name("Boxer Name")
 
@@ -230,13 +228,13 @@ def test_get_boxer_by_name(mock_cursor):
 
     assert result == expected_result, f"Expected {expected_result}, got {result}"
 
-    expected_query = normalize_whitespace("SELECT id, name, weight, height, reach, age FROM boxers WHERE id = ?")
+    expected_query = normalize_whitespace("SELECT id, name, weight, height, reach, age FROM boxers WHERE name = ?")
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
 
     assert actual_query == expected_query, "The SQL query did not match the expected structure."
 
     actual_arguments = mock_cursor.execute.call_args[0][1]
-    expected_arguments = (1,)
+    expected_arguments = ("Boxer Name",)
 
     assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
 
@@ -316,7 +314,7 @@ def test_update_boxer_stats(mock_cursor):
     mock_cursor.fetchone.return_value = True
 
     boxer_id = 1
-    update_boxer_stats(boxer_id)
+    update_boxer_stats(boxer_id, result="win")
 
     expected_query = normalize_whitespace("""
         UPDATE boxers SET fights = fights + 1, wins = wins + 1 WHERE id = ?
