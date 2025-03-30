@@ -104,14 +104,14 @@ def test_fight_with_two_boxers_boxer_five_wins(ring_model, sample_boxer1, sample
     Tests fight between two boxers with predetermined random_number value in fight method. Boxer 5 should win. get_random value is high. 
 
     """
-    boxer4 = Boxer(4, 'Boxer 4', 125, 165, 65.0, 24)
-    boxer5 = Boxer(5, 'Boxer 5', 210, 190, 85.0, 28)
+    boxer4 = Boxer(4, 'Boxer 4', 220, 190, 80.0, 28)
+    boxer5 = Boxer(5, 'Boxer 5', 130, 170, 70.0, 30)
    
-    mocker.patch("boxing.models.ring_model.get_random", return_value=0.9)
+    mocker.patch("boxing.models.ring_model.get_random", return_value=0.99)
     mocker.patch("boxing.models.ring_model.update_boxer_stats")
 
-    ring_model.enter_ring(boxer4)
     ring_model.enter_ring(boxer5)
+    ring_model.enter_ring(boxer4)
 
     assert ring_model.fight() == 'Boxer 5'
     
