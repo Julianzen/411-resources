@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Mar 29 22:07:36 2025
-
-@author: viroop
-"""
-
 #!/bin/bash
 
 # Define the base URL for the Flask API
@@ -210,16 +202,12 @@ simulate_fight() {
   fi
 }
 
-# Initialize the database
-sqlite3 db/playlist.db < sql/init_db.sql
-
 # Health and DB checks
 check_health
 check_db
 
 # Create boxers
 create_boxer "Boxer 1" 172 181 71.5 27
-create_boxer "Boxer 1" 170 180 70 25
 create_boxer "Boxer 2" 188 179 73.2 30
 create_boxer "Boxer 3" 134 170 68.9 24
 create_boxer "Boxer 4" 205 185 76.1 32
@@ -231,17 +219,7 @@ delete_boxer_by_id 4
 get_boxer_by_name "Boxer 1"
 get_boxer_by_id 1
 
-get_boxer_by_id 999
-
 get_boxer_leaderboard wins
-
-enter_boxer_into_ring 1
-enter_boxer_into_ring 2
-enter_boxer_into_ring 3
-
-simulate_fight  
-
-clear_ring
 
 delete_boxer_by_id 3
 
