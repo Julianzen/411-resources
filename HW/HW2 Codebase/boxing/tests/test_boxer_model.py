@@ -109,7 +109,30 @@ def test_create_boxer_invalid_height():
     with pytest.raises(ValueError, match=r"Invalid height: -177 \(must be a positive integer\)."):
         create_boxer(name="Boxer Name", weight=140, height="invalid", reach=20.2,age=30)
 
+def test_create_boxer_invalid_reach():
+    """Test error when trying to create a boxer with an invalid reach (e.g., less than 0 or non-integer).
 
+    """
+    with pytest.raises(ValueError, match=r"Invalid reach: -10 \(must be an integer greater than or equal to 0\)."):
+        create_boxer(name="Boxer Name", weight=140, height=177, reach = -10, age = 30)
+
+    with pytest.raises(ValueError, match=r"Invalid reach: invalid \(must be an integer greater than or equal to 0\)."):
+        create_boxer(name="Boxer Name", weight=140, height=177, reach = "invalid", age = 30)
+        
+def test_create_boxer_invalid_age():
+    """Test error when trying to create a boxer with an invalid age (e.g., less than 18 or greater than 40 or non-integer).
+
+    """
+    with pytest.raises(ValueError, match=r"Invalid age: -10 \(must be an integer less than or equal to 40 and greater than or equal to 18\)."):
+        create_boxer(name="Boxer Name", weight=140, height=177, reach = 20, age = -10)
+    
+    with pytest.raises(ValueError, match=r"Invalid age: 50 \(must be an integer less than or equal to 40 and greater than or equal to 18\)."):
+        create_boxer(name="Boxer Name", weight=140, height=177, reach = 20, age = 50)
+
+    with pytest.raises(ValueError, match=r"Invalid age: invalid \(must be an integer less than or equal to 40 and greater than or equal to 18\)."):
+        create_boxer(name="Boxer Name", weight=140, height=177, reach = 20, age = "invalid")
+        
+        
 def test_delete_boxer(mock_cursor):
     """Test deleting a boxer from the catalog by boxer ID.
 
