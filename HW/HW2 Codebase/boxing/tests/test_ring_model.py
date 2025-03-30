@@ -11,7 +11,7 @@ from dataclasses import asdict
 import pytest
 
 from boxing.models.ring_model import RingModel
-from boxing.models.boxer_model import Boxer
+from boxing.models.boxers_model import Boxer
 
 @pytest.fixture()
 def ring_model():
