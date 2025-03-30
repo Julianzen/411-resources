@@ -110,21 +110,41 @@ class RingModel:
 
     def get_boxers(self) -> List[Boxer]:
         """
-         Enter docstring here. 
+          Retrieve a list of boxers currently in the ring.
+
+        Returns:
+            List[Boxer]: A list of Boxer objects representing the boxers in the ring.
+
+        Note:
+            If there are no boxers in the ring, the function will simply return an empty list.
         """ 
         if not self.ring:
             pass
         else:
             pass
 
+        logger.info(f"Retrieving list of boxers from ring: {self.ring}")
         return self.ring
 
     def get_fighting_skill(self, boxer: Boxer) -> float:
         """
-         Enter docstring here. 
+             Calculate and return the fighting skill of a given boxer.
+
+            The fighting skill is determined using an arbitrary formula based on the boxer's weight,
+            name length, reach, and age. Age modifiers are applied as follows:
+            - Age < 25: -1 modifier
+            - Age > 35: -2 modifier
+            - Age 25-35: No modifier
+
+            Arguments:
+                boxer (Boxer): The boxer whose skill is to be calculated.
+
+            Returns:
+                float: The calculated fighting skill of the boxer.
         """ 
         # Arbitrary calculations
         age_modifier = -1 if boxer.age < 25 else (-2 if boxer.age > 35 else 0)
         skill = (boxer.weight * len(boxer.name)) + (boxer.reach / 10) + age_modifier
 
+        logger.info(f"Retrieving boxer {boxer.name} and their skill: {skill}")
         return skill
