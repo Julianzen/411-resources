@@ -57,10 +57,10 @@ def test_create_boxer(mock_cursor):
     """Test creating a new boxer in the catalog.
 
     """
-    create_boxer(name="Boxer Name", weight=140, height=177, reach=20.2,age=30, weight_class = "HEAVYWEIGHT")
+    create_boxer(name="Boxer Name", weight=140, height=177, reach=20.2,age=30)
 
     expected_query = normalize_whitespace("""
-        INSERT INTO boxer (name, weight, height, reach, age, weight_class)
+        INSERT INTO boxers (name, weight, height, reach, age, weight_class)
         VALUES (?, ?, ?, ?, ?, ?)
     """)
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
@@ -69,80 +69,59 @@ def test_create_boxer(mock_cursor):
 
     # Extract the arguments used in the SQL call (second element of call_args)
     actual_arguments = mock_cursor.execute.call_args[0][1]
-    expected_arguments = ("Boxer Name", 140, 177, 20.2, 30, "HEAVYWEIGHT")
+    expected_arguments = ("Boxer Name", 80, 140, 20.2, 30, "MIDDLEWEIGHT")
 
     assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
 
 
 def test_create_boxer_duplicate(mock_cursor):
-    """Test creating a boxer with a duplicate name, weight, and height (should raise an error).
+    """Test creating a boxer with a duplicate parameters.
 
     """
     # Simulate that the database will raise an IntegrityError due to a duplicate entry
-    mock_cursor.execute.side_effect = sqlite3.IntegrityError("UNIQUE constraint failed: boxer.name, boxer.weight, boxer.height")
+    mock_cursor.execute.side_effect = sqlite3.IntegrityError("UNIQUE constraint failed: boxers.name, boxers.weight, boxers.height, boxers.age")
 
-    with pytest.raises(ValueError, match="Boxer with name 'Boxer Name', weight 140, and height 77 already exists."):
-        create_boxer(name="Boxer Name", weight= 140 , height= 177, reach = 20.2, age = 30, weight_class = "HEAVYWEIGHT")
-
+    with pytest.raises(ValueError, match="Boxer with name 'Boxer Name', height '140', reach '20.2', and age 30 already exists."):
+        create_boxer(name="Boxer Name", weight=140, height=177, reach=20.2,age=30)
 
 def test_create_boxer_invalid_weight():
-    """Test error when trying to create a boxer with an invalid weight (e.g., lower than 125 pounds)
+    """Test error when trying to create a boxer with an invalid weight (e.g., negative weight)
 
     """
-    with pytest.raises(ValueError, match=r"Invalid weight: 100 \(must be greater than or equal to 125\)."):
-        create_boxer(name="Boxer Name", weight = 100, height= 177 , age = 30, reach = 20, weight_class = "MIDDLEWEIGHT")
-
-    with pytest.raises(ValueError, match=r"Invalid weight: -150 \(must be a positive integer\)."):
-        create_boxer(name="Boxer Name", weight=-150 , height = 177, age = 30, reach = 20, weight_class = "MIDDLEWEIGHT")
+    with pytest.raises(ValueError, match=r"Invalid weight: -180 \(must be an integer greater than or equal to 125\)."):
         
-     with pytest.raises(ValueError, match=r"Invalid weight: invalid \(must be a positive integer\)."):
-         create_boxer(name="Boxer Name", weight="invalid", height=177, age = 30, reach = 20, weight_class = "MIDDLEWEIGHT")
+        create_boxer(name="Boxer Name", weight=-140, height=177, reach=20.2,age=30)
+
+    with pytest.raises(ValueError, match=r"Invalid weight: invalid \(must be an integer greater than or equal to 125\)."):
+        
+        create_boxer(name="Boxer Name", weight="invalid", height=177, reach=20.2,age=30)
+
 
 def test_create_boxer_invalid_height():
-    """Test error when trying to create a boxer with an invalid height (e.g., less than 0 or non-integer).
+    """Test error when trying to create a boxer with an invalid height (e.g., non-negative).
 
     """
-    with pytest.raises(ValueError, match=r"Invalid height: -10 \(must be an integer greater than or equal to 0\)."):
-        create_boxer(name="Boxer Name", weight=140, height=-10, age = 30, reach = 20, weight_class = "MIDDLEWEIGHT")
-
-    with pytest.raises(ValueError, match=r"Invalid height: invalid \(must be an integer greater than or equal to 0\)."):
-        create_boxer(name="Boxer Name", weight=140, height="invalid", age = 30, reach = 20, weight_class = "MIDDLEWEIGHT")
-
-def test_create_boxer_invalid_reach():
-    """Test error when trying to create a boxer with an invalid reach (e.g., less than 0 or non-integer).
-
-    """
-    with pytest.raises(ValueError, match=r"Invalid reach: -10 \(must be an integer greater than or equal to 0\)."):
-        create_boxer(name="Boxer Name", weight=140, height=177, age = 30, reach = -10, weight_class = "MIDDLEWEIGHT")
-
-    with pytest.raises(ValueError, match=r"Invalid reach: invalid \(must be an integer greater than or equal to 0\)."):
-        create_boxer(name="Boxer Name", weight=140, height=177, age = 30, reach = "invalid", weight_class = "MIDDLEWEIGHT")
+    with pytest.raises(ValueError, match=r"Invalid height: -177 \(must be a positive integer\)."):
+       
+        create_boxer(name="Boxer Name", weight=140, height=-177, reach=20.2,age=30)
         
-def test_create_boxer_invalid_age():
-    """Test error when trying to create a boxer with an invalid age (e.g., less than 18 or greater than 40 or non-integer).
+
+    with pytest.raises(ValueError, match=r"Invalid height: -177 \(must be a positive integer\)."):
+        create_boxer(name="Boxer Name", weight=140, height="invalid", reach=20.2,age=30)
+
+
+def test_delete_boxer(mock_cursor):
+    """Test deleting a boxer from the catalog by boxer ID.
 
     """
-    with pytest.raises(ValueError, match=r"Invalid age: -10 \(must be an integer less than or equal to 40 and greater than or equal to 18\)."):
-        create_boxer(name="Boxer Name", weight=140, height=177, age = -10, reach = 20, weight_class = "MIDDLEWEIGHT")
-    
-    with pytest.raises(ValueError, match=r"Invalid age: 50 \(must be an integer less than or equal to 40 and greater than or equal to 18\)."):
-        create_boxer(name="Boxer Name", weight=140, height=177, age = 50, reach = 20, weight_class = "MIDDLEWEIGHT")
-
-    with pytest.raises(ValueError, match=r"Invalid age: invalid \(must be an integer less than or equal to 40 and greater than or equal to 18\)."):
-        create_boxer(name="Boxer Name", weight=140, height=177, age = "invalid", reach = 20, weight_class = "MIDDLEWEIGHT")
-        
-def test_delete_song(mock_cursor):
-    """Test deleting a song from the catalog by song ID.
-
-    """
-    # Simulate the existence of a song w/ id=1
+    # Simulate the existence of a boxer w/ id=1
     # We can use any value other than None
     mock_cursor.fetchone.return_value = (True)
 
-    delete_song(1)
+    delete_boxer(1)
 
-    expected_select_sql = normalize_whitespace("SELECT id FROM songs WHERE id = ?")
-    expected_delete_sql = normalize_whitespace("DELETE FROM songs WHERE id = ?")
+    expected_select_sql = normalize_whitespace("SELECT id FROM boxers WHERE id = ?")
+    expected_delete_sql = normalize_whitespace("DELETE FROM boxers WHERE id = ?")
 
     # Access both calls to `execute()` using `call_args_list`
     actual_select_sql = normalize_whitespace(mock_cursor.execute.call_args_list[0][0][0])
@@ -162,37 +141,39 @@ def test_delete_song(mock_cursor):
     assert actual_delete_args == expected_delete_args, f"The UPDATE query arguments did not match. Expected {expected_delete_args}, got {actual_delete_args}."
 
 
-def test_delete_song_bad_id(mock_cursor):
-    """Test error when trying to delete a non-existent song.
+def test_delete_boxer_bad_id(mock_cursor):
+    """Test error when trying to delete a non-existent boxer.
 
     """
-    # Simulate that no song exists with the given ID
+    # Simulate that no boxer exists with the given ID
     mock_cursor.fetchone.return_value = None
 
-    with pytest.raises(ValueError, match="Song with ID 999 not found"):
-        delete_song(999)
+    with pytest.raises(ValueError, match="Boxer with ID 999 not found"):
+        delete_boxer(999)
 
 
 ######################################################
 #
-#    Get Song
+#    Get Boxer
 #
 ######################################################
 
 
-def test_get_song_by_id(mock_cursor):
-    """Test getting a song by id.
+def test_get_boxer_by_id(mock_cursor):
+    """Test getting a boxer by id.
+
+        unsure about the False value
 
     """
-    mock_cursor.fetchone.return_value = (1, "Artist Name", "Song Title", 2022, "Pop", 180, False)
+    mock_cursor.fetchone.return_value = (1, "Boxer Name", 140, 177, 20.2,30, False)
 
-    result = get_song_by_id(1)
+    result = get_boxer_by_id(1)
 
-    expected_result = Song(1, "Artist Name", "Song Title", 2022, "Pop", 180)
+    expected_result = Boxer(1, "Boxer Name", 140, 177, 20.2,30)
 
     assert result == expected_result, f"Expected {expected_result}, got {result}"
 
-    expected_query = normalize_whitespace("SELECT id, artist, title, year, genre, duration FROM songs WHERE id = ?")
+    expected_query = normalize_whitespace("SELECT id, name, weight, height, reach, age FROM boxers WHERE id = ?")
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
 
     assert actual_query == expected_query, "The SQL query did not match the expected structure."
@@ -203,197 +184,125 @@ def test_get_song_by_id(mock_cursor):
     assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
 
 
-def test_get_song_by_id_bad_id(mock_cursor):
-    """Test error when getting a non-existent song.
+def test_get_boxer_by_id_bad_id(mock_cursor):
+    """Test error when getting a non-existent boxer.
 
     """
     mock_cursor.fetchone.return_value = None
 
-    with pytest.raises(ValueError, match="Song with ID 999 not found"):
-        get_song_by_id(999)
+    with pytest.raises(ValueError, match="Boxer with ID 999 not found"):
+        get_boxer_by_id(999)
 
+def test_get_boxer_by_name(mock_cursor):
+    """Test getting a boxer by name.
 
-def test_get_song_by_compound_key(mock_cursor):
-    """Test getting a song by compound key.
+        unsure about the False value
 
     """
-    mock_cursor.fetchone.return_value = (1, "Artist Name", "Song Title", 2022, "Pop", 180, False)
+    mock_cursor.fetchone.return_value = (1, "Boxer Name", 140, 177, 20.2,30, False)
 
-    result = get_song_by_compound_key("Artist Name", "Song Title", 2022)
+    result = get_boxer_by_name("Boxer Name")
 
-    expected_result = Song(1, "Artist Name", "Song Title", 2022, "Pop", 180)
+    expected_result = Boxer(1, "Boxer Name", 140, 177, 20.2,30)
 
     assert result == expected_result, f"Expected {expected_result}, got {result}"
 
-    expected_query = normalize_whitespace("SELECT id, artist, title, year, genre, duration FROM songs WHERE artist = ? AND title = ? AND year = ?")
+    expected_query = normalize_whitespace("SELECT id, name, weight, height, reach, age FROM boxers WHERE id = ?")
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
 
     assert actual_query == expected_query, "The SQL query did not match the expected structure."
 
     actual_arguments = mock_cursor.execute.call_args[0][1]
-    expected_arguments = ("Artist Name", "Song Title", 2022)
+    expected_arguments = (1,)
 
     assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
 
 
-def test_get_song_by_compound_key_bad_id(mock_cursor):
-    """Test error when getting a non-existent song.
+def test_get_boxer_by_id_bad_name(mock_cursor):
+    """Test error when getting a non-existent boxer.
 
     """
     mock_cursor.fetchone.return_value = None
 
-    with pytest.raises(ValueError, match="Song with artist 'Artist Name', title 'Song Title', and year 2022 not found"):
-        get_song_by_compound_key("Artist Name", "Song Title", 2022)
+    with pytest.raises(ValueError, match="Boxer with name Big Fart not found"):
+        get_boxer_by_name("Big Fart")
 
 
-def test_get_all_songs(mock_cursor):
-    """Test retrieving all songs.
 
-    """
+def test_get_leaderboard_sorted_by_wins(mock_cursor):
+    """Test getting the leaderboard sorted by wins."""
     mock_cursor.fetchall.return_value = [
-        (1, "Artist A", "Song A", 2020, "Rock", 210, 10, False),
-        (2, "Artist B", "Song B", 2021, "Pop", 180, 20, False),
-        (3, "Artist C", "Song C", 2022, "Jazz", 200, 5, False)
+        (1, "Boxer A", 150, 180, 75.5, 28, 30, 25, 0.8333),
+        (2, "Boxer B", 160, 185, 78.0, 31, 40, 30, 0.7500)
     ]
 
-    songs = get_all_songs()
+    result = get_leaderboard(sort_by="wins")
 
     expected_result = [
-        {"id": 1, "artist": "Artist A", "title": "Song A", "year": 2020, "genre": "Rock", "duration": 210, "play_count": 10},
-        {"id": 2, "artist": "Artist B", "title": "Song B", "year": 2021, "genre": "Pop", "duration": 180, "play_count": 20},
-        {"id": 3, "artist": "Artist C", "title": "Song C", "year": 2022, "genre": "Jazz", "duration": 200, "play_count": 5}
+        {'id': 1, 'name': "Boxer A", 'weight': 150, 'height': 180, 'reach': 75.5, 'age': 28,
+         'weight_class': get_weight_class(150), 'fights': 30, 'wins': 25, 'win_pct': 83.3},
+        {'id': 2, 'name': "Boxer B", 'weight': 160, 'height': 185, 'reach': 78.0, 'age': 31,
+         'weight_class': get_weight_class(160), 'fights': 40, 'wins': 30, 'win_pct': 75.0}
     ]
 
-    assert songs == expected_result, f"Expected {expected_result}, but got {songs}"
-
-    expected_query = normalize_whitespace("""
-        SELECT id, artist, title, year, genre, duration, play_count
-        FROM songs
-    """)
-    actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
-
-    assert actual_query == expected_query, "The SQL query did not match the expected structure."
-
-
-def test_get_all_songs_empty_catalog(mock_cursor, caplog):
-    """Test that retrieving all songs returns an empty list when the catalog is empty and logs a warning.
-
-    """
-    mock_cursor.fetchall.return_value = []
-
-    result = get_all_songs()
-
-    assert result == [], f"Expected empty list, but got {result}"
-
-    assert "The song catalog is empty." in caplog.text, "Expected warning about empty catalog not found in logs."
-
-    expected_query = normalize_whitespace("SELECT id, artist, title, year, genre, duration, play_count FROM songs")
-    actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
-
-    assert actual_query == expected_query, "The SQL query did not match the expected structure."
-
-
-def test_get_all_songs_ordered_by_play_count(mock_cursor):
-    """Test retrieving all songs ordered by play count.
-
-    """
-    mock_cursor.fetchall.return_value = [
-        (2, "Artist B", "Song B", 2021, "Pop", 180, 20),
-        (1, "Artist A", "Song A", 2020, "Rock", 210, 10),
-        (3, "Artist C", "Song C", 2022, "Jazz", 200, 5)
-    ]
-
-    songs = get_all_songs(sort_by_play_count=True)
-
-    expected_result = [
-        {"id": 2, "artist": "Artist B", "title": "Song B", "year": 2021, "genre": "Pop", "duration": 180, "play_count": 20},
-        {"id": 1, "artist": "Artist A", "title": "Song A", "year": 2020, "genre": "Rock", "duration": 210, "play_count": 10},
-        {"id": 3, "artist": "Artist C", "title": "Song C", "year": 2022, "genre": "Jazz", "duration": 200, "play_count": 5}
-    ]
-
-    assert songs == expected_result, f"Expected {expected_result}, but got {songs}"
-
-    expected_query = normalize_whitespace("""
-        SELECT id, artist, title, year, genre, duration, play_count
-        FROM songs
-        ORDER BY play_count DESC
-    """)
-    actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
-
-    assert actual_query == expected_query, "The SQL query did not match the expected structure."
-
-
-def test_get_random_song(mock_cursor, mocker):
-    """Test retrieving a random song from the catalog.
-
-    """
-    mock_cursor.fetchall.return_value = [
-        (1, "Artist A", "Song A", 2020, "Rock", 210, 10),
-        (2, "Artist B", "Song B", 2021, "Pop", 180, 20),
-        (3, "Artist C", "Song C", 2022, "Jazz", 200, 5)
-    ]
-
-    # Mock random number generation to return the 2nd song
-    mock_random = mocker.patch("playlist.models.song_model.get_random", return_value=2)
-
-    result = get_random_song()
-
-    expected_result = Song(2, "Artist B", "Song B", 2021, "Pop", 180)
     assert result == expected_result, f"Expected {expected_result}, got {result}"
 
-    # Ensure that the random number was called with the correct number of songs
-    mock_random.assert_called_once_with(3)
-
-    expected_query = normalize_whitespace("SELECT id, artist, title, year, genre, duration, play_count FROM songs")
+    expected_query = normalize_whitespace(
+        """
+        SELECT id, name, weight, height, reach, age, fights, wins, (wins * 1.0 / fights) AS win_pct
+        FROM boxers
+        WHERE fights > 0 ORDER BY wins DESC
+        """
+    )
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
 
     assert actual_query == expected_query, "The SQL query did not match the expected structure."
 
 
-def test_get_random_song_empty_catalog(mock_cursor, mocker):
-    """Test retrieving a random song when the catalog is empty.
+def test_get_leaderboard_invalid_sort_by(mock_cursor):
+    """Test error when invalid sort_by parameter is used."""
+    with pytest.raises(ValueError, match="Invalid sort_by parameter: invalid_metric"):
+        get_leaderboard(sort_by="invalid_metric")
 
-    """
-    mock_cursor.fetchall.return_value = []
 
-    mock_random = mocker.patch("playlist.models.song_model.get_random")
 
-    with pytest.raises(ValueError, match="The song catalog is empty"):
-        get_random_song()
+def test_get_weight_class(mock_cursor):
+    """Test for correct weight class classification."""
+    result = get_weight_class(150)
+    expected_result = 'LIGHTWEIGHT'
+    assert result == expected_result, f"Expected {expected_result}, got {result}"
 
-    # Ensure that the random number was not called since there are no songs
-    mock_random.assert_not_called()
+def test_get_weight_class_invalid_weight(mock_cursor):
+    """Test for invalid weight classification."""
+    with pytest.raises(ValueError, match="Invalid weight: 124. Weight must be at least 125."):
+        get_weight_class(124)
 
-    expected_query = normalize_whitespace("SELECT id, artist, title, year, genre, duration, play_count FROM songs ")
-    actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
-
-    assert actual_query == expected_query, "The SQL query did not match the expected structure."
 
 
 ######################################################
 #
-#    Play count
+#    Boxer Win count
 #
 ######################################################
 
 
-def test_update_play_count(mock_cursor):
-    """Test updating the play count of a song.
+def test_update_boxer_stats(mock_cursor):
+    """Test updating the win count of a boxer.
 
     """
     mock_cursor.fetchone.return_value = True
 
-    song_id = 1
-    update_play_count(song_id)
+    boxer_id = 1
+    update_boxer_stats(boxer_id)
 
     expected_query = normalize_whitespace("""
-        UPDATE songs SET play_count = play_count + 1 WHERE id = ?
+        UPDATE boxers SET fights = fights + 1, wins = wins + 1 WHERE id = ?
     """)
     actual_query = normalize_whitespace(mock_cursor.execute.call_args_list[1][0][0])
 
     assert actual_query == expected_query, "The SQL query did not match the expected structure."
 
     actual_arguments = mock_cursor.execute.call_args_list[1][0][1]
-    expected_arguments = (song_id,)
+    expected_arguments = (boxer_id,)
 
     assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
