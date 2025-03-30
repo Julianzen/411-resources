@@ -226,6 +226,7 @@ create_boxer "Boxer 4" 205 185 76.1 32
 create_boxer "Boxer 5" 145 174 69.4 22
 
 delete_boxer_by_id 5
+delete_boxer_by_id 4
 
 get_boxer_by_name "Boxer 1"
 get_boxer_by_id 1
@@ -241,6 +242,8 @@ enter_boxer_into_ring 3
 simulate_fight  
 
 clear_ring
+
+delete_boxer_by_id 3
 
 enter_boxer_into_ring 1
 enter_boxer_into_ring 2
