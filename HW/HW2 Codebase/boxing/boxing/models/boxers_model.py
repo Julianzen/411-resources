@@ -279,9 +279,22 @@ def get_boxer_by_name(boxer_name: str) -> Boxer:
 
 def get_weight_class(weight: int) -> str:
     
+        
     """
-     Enter docstring here. 
+     Gets the boxer's weight class
+     
+     Argument: 
+         
+         1 string variable: boxer_weight -> Returns the weight class the boxer belongs in a string. 
+    
+    Exceptions Raised: 
+        ValueError raised if boxer_weight is not an integer or less than 125.
+        sqlite3.Error raised if there are any database errors. 
+        
+    Returned: 
+        Weight class of the boxer as string form.
     """ 
+    
     
     if weight >= 203:
         weight_class = 'HEAVYWEIGHT'
@@ -292,6 +305,7 @@ def get_weight_class(weight: int) -> str:
     elif weight >= 125:
         weight_class = 'FEATHERWEIGHT'
     else:
+        logger.error(f"Invalid weight. Needs to be at least 125:  {weight}: {e}")
         raise ValueError(f"Invalid weight: {weight}. Weight must be at least 125.")
 
     return weight_class
@@ -299,9 +313,16 @@ def get_weight_class(weight: int) -> str:
 
 def update_boxer_stats(boxer_id: int, result: str) -> None:
     
+    """Increments the wint count of a boxer by boxer ID.
+
+    Args:
+        boxer_id (int): The ID of the song whose play count should be incremented.
+
+    Raises:
+        ValueError: If the boxer does not exist.
+        sqlite3.Error: If any database error occurs.
+
     """
-     Enter docstring here. 
-    """ 
     
     if result not in {'win', 'loss'}:
         raise ValueError(f"Invalid result: {result}. Expected 'win' or 'loss'.")
@@ -309,10 +330,12 @@ def update_boxer_stats(boxer_id: int, result: str) -> None:
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
-
+            logger.info(f"Attempting to update boxer count for boxer with ID {boxer_id}")
             cursor.execute("SELECT id FROM boxers WHERE id = ?", (boxer_id,))
             if cursor.fetchone() is None:
+                logger.warning(f"Cannot update boxer count: Boxer with ID {boxer_id} not found.")
                 raise ValueError(f"Boxer with ID {boxer_id} not found.")
+               
 
             if result == 'win':
                 cursor.execute("UPDATE boxers SET fights = fights + 1, wins = wins + 1 WHERE id = ?", (boxer_id,))
@@ -320,6 +343,7 @@ def update_boxer_stats(boxer_id: int, result: str) -> None:
                 cursor.execute("UPDATE boxers SET fights = fights + 1 WHERE id = ?", (boxer_id,))
 
             conn.commit()
-
+            logger.info(f"Win count incremented for boxer with ID: {boxer_id}")
     except sqlite3.Error as e:
+        logger.error(f"Database error while updating play count for boxer with ID {boxer_id}: {e}")
         raise e
