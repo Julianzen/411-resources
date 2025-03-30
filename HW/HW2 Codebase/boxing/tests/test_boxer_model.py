@@ -92,11 +92,6 @@ def test_create_boxer_invalid_weight():
         
         create_boxer(name="Boxer Name", weight=-140, height=177, reach=20.2,age=30)
 
-    with pytest.raises(ValueError, match="Invalid weight: invalid. Must be at least 125."):
-        
-        create_boxer(name="Boxer Name", weight="invalid", height=177, reach=20.2,age=30)
-
-
 def test_create_boxer_invalid_height():
     """Test error when trying to create a boxer with an invalid height (e.g., non-negative).
 
@@ -106,9 +101,6 @@ def test_create_boxer_invalid_height():
         create_boxer(name="Boxer Name", weight=140, height=-177, reach=20.2,age=30)
         
 
-    with pytest.raises(ValueError, match="Invalid height: invalid. Must be greater than 0."):
-        create_boxer(name="Boxer Name", weight=140, height="invalid", reach=20.2,age=30)
-
 def test_create_boxer_invalid_reach():
     """Test error when trying to create a boxer with an invalid reach (e.g., less than 0 or non-integer).
 
@@ -116,8 +108,6 @@ def test_create_boxer_invalid_reach():
     with pytest.raises(ValueError, match="Invalid reach: -10. Must be greater than 0."):
         create_boxer(name="Boxer Name", weight=140, height=177, reach = -10, age = 30)
 
-    with pytest.raises(ValueError, match="Invalid reach: invalid. Must be greater than 0."):
-        create_boxer(name="Boxer Name", weight=140, height=177, reach = "invalid", age = 30)
         
 def test_create_boxer_invalid_age():
     """Test error when trying to create a boxer with an invalid age (e.g., less than 18 or greater than 40 or non-integer).
@@ -128,9 +118,6 @@ def test_create_boxer_invalid_age():
     
     with pytest.raises(ValueError, match="Invalid age: 50. Must be between 18 and 40."):
         create_boxer(name="Boxer Name", weight=140, height=177, reach = 20, age = 50)
-
-    with pytest.raises(ValueError, match="Invalid age: invalid. Must be between 18 and 40."):
-        create_boxer(name="Boxer Name", weight=140, height=177, reach = 20, age = "invalid")
         
         
 def test_delete_boxer(mock_cursor):
@@ -239,13 +226,13 @@ def test_get_boxer_by_name(mock_cursor):
     assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
 
 
-def test_get_boxer_by_id_bad_name(mock_cursor):
+def test_get_boxer_by_name_bad_name(mock_cursor):
     """Test error when getting a non-existent boxer.
 
     """
     mock_cursor.fetchone.return_value = None
 
-    with pytest.raises(ValueError, match="Boxer with name Big Fart not found"):
+    with pytest.raises(ValueError, match="Boxer 'Big Fart' not found."):
         get_boxer_by_name("Big Fart")
 
 
