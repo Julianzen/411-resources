@@ -305,7 +305,7 @@ def get_weight_class(weight: int) -> str:
     elif weight >= 125:
         weight_class = 'FEATHERWEIGHT'
     else:
-        logger.error(f"Invalid weight. Needs to be at least 125:  {weight}: {e}")
+        logger.error(f"Invalid weight. Needs to be at least 125: {weight}")
         raise ValueError(f"Invalid weight: {weight}. Weight must be at least 125.")
 
     return weight_class
