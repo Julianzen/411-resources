@@ -60,7 +60,7 @@ create_boxer() {
   age=$5
 
   echo "Creating boxer: $name (Weight: $weight, Height: $height, Reach: $reach, Age: $age)..."
-  curl -s -X POST "$BASE_URL/create-boxer" -H "Content-Type: application/json" \
+  curl -s -X POST "$BASE_URL/add-boxer" -H "Content-Type: application/json" \
     -d "{\"name\": \"$name\", \"weight\": $weight, \"height\": $height, \"reach\": $reach, \"age\": $age}" | grep -q '"status": "success"'
 
   if [ $? -eq 0 ]; then
@@ -107,7 +107,7 @@ get_boxer_by_name() {
   name=$1
 
   echo "Getting boxer by name: $name..."
-  response=$(curl -s -X GET "$BASE_URL/get-boxer-by-name?name=$(echo $name | sed 's/ /%20/g')")
+    response=$(curl -s -X GET "$BASE_URL/get-boxer-by-name/$(echo $name | sed 's/ /%20/g')")
 
   if echo "$response" | grep -q '"status": "success"'; then
     echo "Boxer retrieved successfully by name."
@@ -124,7 +124,7 @@ get_boxer_by_name() {
 get_boxer_leaderboard() {
   sort_by=$1
   echo "Getting boxer leaderboard sorted by $sort_by..."
-  response=$(curl -s -X GET "$BASE_URL/get-leaderboard?sort_by=$sort_by")
+  response=$(curl -s -X GET "$BASE_URL/leaderboard?sort_by=$sort_by")
 
   if echo "$response" | grep -q '"status": "success"'; then
     echo "Boxer leaderboard retrieved successfully."
@@ -145,13 +145,14 @@ get_boxer_leaderboard() {
 ############################################################
 
 enter_boxer_into_ring() {
-  boxer_id=$1
+  boxer_name=$1
 
-  echo "Entering boxer with ID ($boxer_id) into the ring..."
-  response=$(curl -s -X POST "$BASE_URL/enter-boxer-into-ring/$boxer_id")
+  echo "Entering boxer with name ($boxer_name) into the ring..."
+  response=$(curl -s -X POST "$BASE_URL/enter-ring" -H "Content-Type: application/json" \
+    -d "{\"name\": \"$boxer_name\"}")
 
   if echo "$response" | grep -q '"status": "success"'; then
-    echo "Boxer with ID ($boxer_id) entered the ring successfully."
+    echo "Boxer with name ($boxer_name) entered the ring successfully."
   else
     echo "Failed to enter boxer into the ring."
     exit 1
@@ -160,7 +161,7 @@ enter_boxer_into_ring() {
 
 get_boxers_in_ring() {
   echo "Getting boxers currently in the ring..."
-  response=$(curl -s -X GET "$BASE_URL/get-boxers-in-ring")
+  response=$(curl -s -X GET "$BASE_URL/get-boxers")
 
   if echo "$response" | grep -q '"status": "success"'; then
     echo "Boxers in ring retrieved successfully."
@@ -176,7 +177,7 @@ get_boxers_in_ring() {
 
 clear_ring() {
   echo "Clearing the ring..."
-  response=$(curl -s -X POST "$BASE_URL/clear-ring")
+  response=$(curl -s -X POST "$BASE_URL/clear-boxers")
 
   if echo "$response" | grep -q '"status": "success"'; then
     echo "Ring cleared successfully."
@@ -188,7 +189,7 @@ clear_ring() {
 
 simulate_fight() {
   echo "Simulating fight between boxers in the ring..."
-  response=$(curl -s -X POST "$BASE_URL/fight")
+  response=$(curl -s -X GET "$BASE_URL/fight")
 
   if echo "$response" | grep -q '"status": "success"'; then
     echo "Fight simulation successful."
@@ -223,8 +224,8 @@ get_boxer_leaderboard wins
 
 delete_boxer_by_id 3
 
-enter_boxer_into_ring 1
-enter_boxer_into_ring 2
+enter_boxer_into_ring "Boxer 1"
+enter_boxer_into_ring "Boxer 2"
 
 simulate_fight
 
